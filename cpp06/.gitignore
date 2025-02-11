@@ -1,0 +1,14 @@
+/ex*/build/
+/ex00/cast
+/ex01/cast
+/ex02/cast
+/ex*/subject.txt
+*.d
+*.o
+*_shrubbery
+flake.nix
+flake.lock
+.envrc
+.clangd
+.clang-format
+

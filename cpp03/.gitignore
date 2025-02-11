@@ -1,0 +1,14 @@
+/ex*/build/
+/ex00/trap
+/ex01/trap
+/ex02/trap
+/ex03/trap
+/ex*/subject.txt
+*.d
+*.o
+flake.nix
+flake.lock
+.envrc
+.clangd
+.clang-format
+

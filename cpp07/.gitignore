@@ -1,0 +1,13 @@
+/ex*/build/
+/ex00/whatever
+/ex01/iter
+/ex02/array
+/ex*/subject.txt
+*.d
+*.o
+flake.nix
+flake.lock
+.envrc
+.clangd
+.clang-format
+

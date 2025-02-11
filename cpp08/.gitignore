@@ -1,0 +1,14 @@
+/ex*/build/
+/ex00/find
+/ex01/span
+/ex02/mutant
+/ex*/subject.txt
+subject.txt
+*.d
+*.o
+flake.nix
+flake.lock
+.envrc
+.clangd
+.clang-format
+

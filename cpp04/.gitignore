@@ -1,0 +1,14 @@
+/ex*/build/
+/ex00/findus
+/ex01/findus
+/ex02/findus
+/ex03/harry
+/ex*/subject.txt
+*.d
+*.o
+flake.nix
+flake.lock
+.envrc
+.clangd
+.clang-format
+

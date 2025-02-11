@@ -1,0 +1,15 @@
+/ex*/build/
+/ex00/office
+/ex01/office
+/ex02/office
+/ex03/office
+/ex*/subject.txt
+*.d
+*.o
+*_shrubbery
+flake.nix
+flake.lock
+.envrc
+.clangd
+.clang-format
+
