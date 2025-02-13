@@ -6,30 +6,28 @@
 #    By: maiboyer <maiboyer@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/03 13:20:01 by maiboyer          #+#    #+#              #
-#    Updated: 2024/11/08 16:55:50 by maiboyer         ###   ########.fr        #
+#    Updated: 2025/02/10 15:35:56 by maiboyer         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CXXFLAGS_ADDITIONAL ?=
 
-SUBJECT_URL		=	https://cdn.intra.42.fr/pdf/pdf/141618/en.subject.pdf
+SUBJECT_URL		=	https://cdn.intra.42.fr/pdf/pdf/149679/en.subject.pdf
 
 BUILD_DIR		?=	./build
 SRC_DIR			=	.
 INCLUDE_DIR		=	.
 
 BASE_PATH		?=	$(shell pwd)
-NAME			=	trap
+NAME			=	find
 
-LIB_NAME		?=	
 TARGET			=	./$(NAME)
-CXX				=	 c++
-CXXFLAGS			=	-Wall -Werror -Wextra -MMD -std=c++98
-CXXFLAGS			+=	$(CXXFLAGS_ADDITIONAL)
+CXX				=	c++
+CXXFLAGS		=	-Wall -Werror -Wextra -MMD -std=c++98
+CXXFLAGS		+=	$(CXXFLAGS_ADDITIONAL)
 
 -include 			./Filelist.mk
 
-SRC				=	$(addsuffix .cpp,$(addprefix $(SRC_DIR)/,$(GEN_FILES)))
 OBJ				=	$(addsuffix .o,$(addprefix $(BUILD_DIR)/,$(SRC_FILES)))
 DEPS			=	$(addsuffix .d,$(addprefix $(BUILD_DIR)/,$(SRC_FILES)))
 
@@ -43,7 +41,7 @@ COL_RESET		=	\033[0m
 COL_WHITE		=	\033[37m
 
 
-.PHONY = all bonus clean re subject build_filelist
+.PHONY = all bonus clean re subject filelist
 
 all: $(NAME)
 
@@ -76,7 +74,7 @@ subject.txt:
 	@curl $(SUBJECT_URL) | pdftotext -layout -nopgbrk -q - subject.txt
 
 
-build_filelist:
+filelist:
 	@rm -f Filelist.mk
 	@printf '%-78s\\\n' "SRC_FILES =" > Filelist.mk
 	@tree $(SRC_DIR) -ifF | rg '$(SRC_DIR)/(.*)\.cpp$$' --replace '$$1' | sed -re 's/^(.*)_([0-9]+)$$/\1|\2/g' | sort -t'|' --key=1,1 --key=2,2n | sed -e's/|/_/' | xargs printf '%-78s\\\n' >> Filelist.mk

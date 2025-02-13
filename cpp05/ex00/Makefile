@@ -24,7 +24,7 @@ NAME			=	office
 
 LIB_NAME		?=	
 TARGET			=	./$(NAME)
-CXX				?=	c++
+CXX				=	 c++
 CXXFLAGS		=	-Wall -Werror -Wextra -MMD -std=c++98
 CXXFLAGS		+=	$(CXXFLAGS_ADDITIONAL)
 

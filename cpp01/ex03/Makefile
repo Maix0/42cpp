@@ -23,7 +23,7 @@ NAME			=	war
 
 LIB_NAME		?=	
 TARGET			=	./$(NAME)
-CXX				?=	c++
+CXX				=	 c++
 CFLAGS			=	-Wall -Werror -Wextra -MMD -std=c++98
 CFLAGS			+=	$(CFLAGS_ADDITIONAL)
 
