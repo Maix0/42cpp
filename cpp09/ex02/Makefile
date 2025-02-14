@@ -6,20 +6,20 @@
 #    By: maiboyer <maiboyer@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/03 13:20:01 by maiboyer          #+#    #+#              #
-#    Updated: 2025/02/11 16:43:24 by maiboyer         ###   ########.fr        #
+#    Updated: 2025/02/14 21:17:59 by maiboyer         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CXXFLAGS_ADDITIONAL ?= -g
 
-SUBJECT_URL		=	https://cdn.intra.42.fr/pdf/pdf/149679/en.subject.pdf
+SUBJECT_URL		=	https://cdn.intra.42.fr/pdf/pdf/149365/en.subject.pdf
 
 BUILD_DIR		?=	./build
 SRC_DIR			=	.
 INCLUDE_DIR		=	.
 
 BASE_PATH		?=	$(shell pwd)
-NAME			=	mutant
+NAME			=	PmergeMe
 
 TARGET			=	./$(NAME)
 CXX				=	c++

@@ -1,4 +1,4 @@
 SRC_FILES =                                                                   \
-Span                                                                          \
+RPN                                                                           \
 main                                                                          \
 

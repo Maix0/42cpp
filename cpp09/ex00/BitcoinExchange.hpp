@@ -6,7 +6,7 @@
 /*   By: maiboyer <maiboyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 13:54:24 by maiboyer          #+#    #+#             */
-/*   Updated: 2025/02/14 20:13:56 by maiboyer         ###   ########.fr       */
+/*   Updated: 2025/02/14 21:03:17 by maiboyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #define BITCOINEXCHANGE_HPP
 
 #include <algorithm>
+#include <cstddef>
 #include <exception>
 #include <fstream>
 #include <iostream>
@@ -61,8 +62,8 @@ public:
 	virtual ~Parser() {};
 
 	typedef std::multimap<Key, Value> Data;
-	typedef Key					 (*ParseKey)(const std::string& s);
-	typedef Value				 (*ParseValue)(const std::string& s);
+	typedef Key						  (*ParseKey)(const std::string& s);
+	typedef Value					  (*ParseValue)(const std::string& s);
 
 private:
 	const ParseKey	 pkey;
@@ -91,7 +92,9 @@ protected:
 		std::string line;
 		// we skip the first line since it is a header containing the names of the columns
 		std::getline(file, line);
-		while (std::getline(file, line)) {
+		std::size_t i = 0;
+		std::cout << "\nParsing file " << filename << ":" << std::endl;
+		while (i++, std::getline(file, line)) {
 			std::stringstream ss(line);
 			std::string		  key, value;
 
@@ -100,14 +103,14 @@ protected:
 					Key	  k = this->pkey(key);
 					Value v = this->pval(value);
 					if (!ALLOW_DUPLICATE && this->data.count(k) != 0)
-						std::cerr << "Error: " << "Duplicate keys (skipping...): " << line << std::endl;
+						std::cerr << "Error: " << "Duplicate keys on line[" << i << "] (skipping...): " << line << std::endl;
 					else
 						this->data.insert(std::make_pair(k, v));
 				} catch (const std::exception& e) {
-					std::cerr << "Error: " << e.what() << " for line: " << line << std::endl;
+					std::cerr << "Error: " << e.what() << " for line[" << i << "]: " << line << std::endl;
 				}
 			} else
-				std::cerr << "Error: " << "Invalid format" << " for line: " << line << std::endl;
+				std::cerr << "Error: " << "Invalid format" << " for line[" << i << "]: " << line << std::endl;
 		}
 		file.close();
 	};
@@ -123,10 +126,10 @@ public:
 	~BitcoinPrices();
 	typedef Parser<Date, double, ',', false>::Data Data;
 
-	const Data&								getData() const;
+	const Data&									   getData() const;
 
 	/// this is the .csv file given in the subject
-	static BitcoinPrices					from_file(const std::string& filename);
+	static BitcoinPrices						   from_file(const std::string& filename);
 };
 
 std::ostream& operator<<(std::ostream& os, const BitcoinPrices& obj);
@@ -142,10 +145,10 @@ public:
 
 	typedef Parser<Date, double, '|', true>::Data Data;
 
-	const Data&								getData() const;
+	const Data&									  getData() const;
 
 	/// this is the .txt file given in the user
-	static BitcoinHoldings					from_file(const std::string& filename);
+	static BitcoinHoldings						  from_file(const std::string& filename);
 };
 
 std::ostream& operator<<(std::ostream& os, const BitcoinHoldings& obj);
