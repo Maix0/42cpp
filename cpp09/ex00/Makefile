@@ -6,7 +6,7 @@
 #    By: maiboyer <maiboyer@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/03 13:20:01 by maiboyer          #+#    #+#              #
-#    Updated: 2025/02/10 15:35:56 by maiboyer         ###   ########.fr        #
+#    Updated: 2025/02/14 20:15:53 by maiboyer         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ SRC_DIR			=	.
 INCLUDE_DIR		=	.
 
 BASE_PATH		?=	$(shell pwd)
-NAME			=	find
+NAME			=	ftt
 
 TARGET			=	./$(NAME)
 CXX				=	c++

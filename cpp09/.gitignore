@@ -1,7 +1,7 @@
 /ex*/build/
-/ex00/find
-/ex01/span
-/ex02/mutant
+/ex00/ftt
+/ex01/rpn
+/ex02/ford
 /ex*/subject.txt
 subject.txt
 *.d
@@ -11,4 +11,7 @@ flake.lock
 .envrc
 .clangd
 .clang-format
-
+cpp_09.tgz
+cpp_09/
+/ex00/data.csv
+/ex00/input.txt
