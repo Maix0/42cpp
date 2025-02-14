@@ -6,52 +6,19 @@
 /*   By: maiboyer <maiboyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/10 15:18:37 by maiboyer          #+#    #+#             */
-/*   Updated: 2025/02/10 15:41:05 by maiboyer         ###   ########.fr       */
+/*   Updated: 2025/02/14 20:14:17 by maiboyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./easyfind.hpp"
-#include <deque>
 #include <iostream>
-#include <list>
-#include <vector>
-
-int main(void)
-{
-	std::cout << "\nstd::vector<int>" << std::endl;
-	std::vector<int> v;
-	for (int i = 0; i < 15; i++)
-	{
-		v.push_back(i * i);
+#include "BitcoinExchange.hpp"
+int main(int argc, char* argv[]) {
+	if (argc != 2) {
+		std::cerr << "usage: " << (argv[0] ? argv[0] : "./bitcoin") << " <filename>" << std::endl;
+		return 1;
 	}
-	easyfind(v, 5 * 5);
-	easyfind(v, 24);
-	easyfind(v, -9);
-	easyfind(v, 9);
+	BitcoinPrices prices = BitcoinPrices::from_file("./data.csv");
+	BitcoinHoldings holdings = BitcoinHoldings::from_file(argv[1]);
 
-
-	std::cout << "\nstd::list<int>" << std::endl;
-	std::list<int> l;
-	for (int i = 0; i < 15; i++)
-	{
-		l.push_front(i * i);
-	}
-	easyfind(l, 5 * 5);
-	easyfind(l, 24);
-	easyfind(l, -9);
-	easyfind(l, 9);
-
-	std::cout << "\nstd::deque<int>" << std::endl;
-	std::deque<int> d;
-	for (int i = 0; i < 15; i++)
-	{
-		if (i % 2)
-			d.push_front(i * i);
-		else
-			d.push_back(-(i * i));
-	}
-	easyfind(d, 5 * 5);
-	easyfind(d, -25);
-	easyfind(d, -9);
-	easyfind(d, 9);
+	std::cout << holdings << std::endl;
 }
