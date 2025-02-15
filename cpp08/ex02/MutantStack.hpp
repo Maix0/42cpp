@@ -6,7 +6,7 @@
 /*   By: maiboyer <maiboyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/10 17:49:50 by maiboyer          #+#    #+#             */
-/*   Updated: 2025/02/15 16:46:31 by maiboyer         ###   ########.fr       */
+/*   Updated: 2025/02/15 18:15:18 by maiboyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 #include <stack>
 
-template <typename T> struct MutantStack : std::stack<T>
+template <typename T> struct MutantStack : public std::stack<T>
 {
 public:
 	typedef typename std::stack<T>::container_type::iterator				iterator;
