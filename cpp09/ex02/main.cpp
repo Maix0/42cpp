@@ -6,7 +6,7 @@
 /*   By: maiboyer <maiboyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 16:49:00 by maiboyer          #+#    #+#             */
-/*   Updated: 2025/02/18 23:09:44 by maiboyer         ###   ########.fr       */
+/*   Updated: 2025/02/18 23:11:50 by maiboyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,11 +82,10 @@ void do_test(int values[], size_t size, std::string name) {
 	std::cout << std::endl;
 }
 
-#define NB 3000
+#define NB 10000
+int values[NB] = {0};
 
 int main() {
-	int values[NB] = {0};
-
 	std::srand(std::time(NULL));
 	for (int i = 0; i < NB; i++)
 		values[i] = std::rand() % (3 * NB);
