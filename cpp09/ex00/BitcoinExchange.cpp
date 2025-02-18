@@ -6,7 +6,7 @@
 /*   By: maiboyer <maiboyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 21:48:21 by maiboyer          #+#    #+#             */
-/*   Updated: 2025/02/14 20:09:10 by maiboyer         ###   ########.fr       */
+/*   Updated: 2025/02/18 13:44:18 by maiboyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,8 +154,8 @@ static double _parse_double(const std::string& raw) {
 }
 
 BitcoinPrices::~BitcoinPrices() {};
-BitcoinPrices::BitcoinPrices() : Parser(Date::parse, _parse_double<0, UINT_MAX>) {};
-BitcoinPrices::BitcoinPrices(const BitcoinPrices& rhs) : Parser(Date::parse, _parse_double<0, UINT_MAX>) {
+BitcoinPrices::BitcoinPrices() : Parser(Date::parse, _parse_double<0, UINT_MAX>, NULL) {};
+BitcoinPrices::BitcoinPrices(const BitcoinPrices& rhs) : Parser(Date::parse, _parse_double<0, UINT_MAX>, NULL) {
 	this->data = rhs.data;
 };
 
@@ -166,8 +166,9 @@ BitcoinPrices& BitcoinPrices::operator=(const BitcoinPrices& rhs) {
 
 BitcoinPrices BitcoinPrices::from_file(const std::string& filename) {
 	BitcoinPrices out;
+	int			  dummy = 0;
 
-	out.parseFile(filename);
+	out.parseFile(filename, dummy);
 	return out;
 }
 
@@ -184,9 +185,32 @@ std::ostream& operator<<(std::ostream& os, const BitcoinPrices& obj) {
 	return (os);
 }
 
+static double _get_price_at(const Date& date, const BitcoinPrices& prices) {
+	const BitcoinPrices::Data& data = prices.getData();
+	if (data.count(date))
+		return (data.find(date)->second);
+	BitcoinPrices::Data::const_iterator it = data.lower_bound(date);
+
+	if (it == data.begin())
+		return -1;
+	--it;
+	return (it->second);
+}
+
+static bool _valid_state(const Date& date, const double& holding, const BitcoinPrices& prices) {
+	double price = _get_price_at(date, prices);
+	if (price < 0.f) {
+		std::cout << COLB_YELLOW "Couldn't get price for " << holding << " at " << date
+				  << " since it is before the first recorded price !" RESET << std::endl;
+		return false;
+	}
+	std::cout << GREEN << date << " = $" << holding * price << RESET << std::endl;
+	return (true);
+}
+
 BitcoinHoldings::~BitcoinHoldings() {};
-BitcoinHoldings::BitcoinHoldings() : Parser(Date::parse, _parse_double<0, 1000>) {};
-BitcoinHoldings::BitcoinHoldings(const BitcoinHoldings& rhs) : Parser(Date::parse, _parse_double<0, 1000>) {
+BitcoinHoldings::BitcoinHoldings() : Parser(Date::parse, _parse_double<0, 1000>, _valid_state) {};
+BitcoinHoldings::BitcoinHoldings(const BitcoinHoldings& rhs) : Parser(Date::parse, _parse_double<0, 1000>, _valid_state) {
 	this->data = rhs.data;
 };
 
@@ -195,10 +219,10 @@ BitcoinHoldings& BitcoinHoldings::operator=(const BitcoinHoldings& rhs) {
 	return (*this);
 }
 
-BitcoinHoldings BitcoinHoldings::from_file(const std::string& filename) {
+BitcoinHoldings BitcoinHoldings::from_file(const std::string& filename, const BitcoinPrices& prices) {
 	BitcoinHoldings out;
 
-	out.parseFile(filename);
+	out.parseFile(filename, prices);
 	return out;
 }
 
