@@ -6,7 +6,7 @@
 /*   By: maiboyer <maiboyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:02:57 by maiboyer          #+#    #+#             */
-/*   Updated: 2025/02/18 19:40:28 by maiboyer         ###   ########.fr       */
+/*   Updated: 2025/02/18 22:22:08 by maiboyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,25 @@
 
 #include <cassert>
 #include <cstddef>
+#include <iterator>
 #include <memory>
 
-template <template <typename Value, typename Allocator = std::allocator<Value> /**/> typename T>
+/// copy the iterator and advance it by n elements
+template <class InputIt>
+InputIt advance(InputIt it, int n = 1) {
+	std::advance(it, n);
+	return it;
+}
+
+#define Titerator typename T<int>::iterator
+#define TT		  T<T<int> >
+#define BTEMPLATE template <template <typename Value, typename Allocator = std::allocator<Value> > class T>
+
+BTEMPLATE
 static T<int> merge(T<int> left, T<int> right) {
-	T<int>					  sorted_list;
-	typename T<int>::iterator lit = left.begin();
-	typename T<int>::iterator rit = right.begin();
+	T<int>	  sorted_list;
+	Titerator lit = left.begin();
+	Titerator rit = right.begin();
 
 	while (lit != left.end() && rit != right.end()) {
 		if (*lit < *rit)
@@ -34,58 +46,53 @@ static T<int> merge(T<int> left, T<int> right) {
 	return (sorted_list);
 }
 
-template <template <typename Value, typename Allocator = std::allocator<Value> /**/> typename T>
+BTEMPLATE
 static T<int> insertion(T<int> l) {
 	assert(!l.empty());
-	for (typename T<int>::iterator i = ++(l.begin()); i != l.end(); i++) {
-		typename T<int>::value_type key = *i;
-		typename T<int>::iterator	j	= --i;
-		i++;
-		while (j != l.begin() && *j > key) {
-			typename T<int>::iterator j_next = ++j;
-			*(j_next)						 = *--j;
+	for (Titerator i = advance(l.begin()); i != l.end(); i++) {
+		int		  key = *i;
+		Titerator j	  = advance(i, -1);
+		while (std::distance(j, l.begin()) >= 0 && *j > key) {
+			*advance(j) = *j;
 			j--;
 		}
-		*(++j) = key;
+		*advance(j) = key;
 	}
 	return l;
 }
 
-template <template <typename Value, typename Allocator = std::allocator<Value> /**/> typename T>
-static T<int> wrap(int lhs) {
+BTEMPLATE
+static T<int> w(int lhs) {
 	T<int> out;
 	out.push_back(lhs);
 	return (out);
 }
 
-template <template <typename Value, typename Allocator = std::allocator<Value> /**/> typename T>
+BTEMPLATE
 T<int> PMergeMe(T<int> l) {
 	std::size_t len = l.size();
 
 	if (len < 10)
 		return (insertion(l));
 
-	T<T<int> /**/> pairs;
-	for (typename T<int>::iterator i = l.begin(); i != l.end(); i++) {
-		typename T<int>::iterator prev = i++;
-
-		if (i != l.end())
-			pairs.push_back(merge(wrap<T>(*prev), wrap<T>(*i)));
+	TT pairs;
+	for (Titerator i = l.begin(); i != l.end(); i = advance(i, 2)) {
+		if (advance(i) != l.end())
+			pairs.push_back(merge(w<T>(*i), w<T>(*advance(i))));
 		else {
-			pairs.push_back(wrap<T>(*prev));
+			pairs.push_back(w<T>(*i));
 			break;	// need to break manually otherwise we get screwed with the +=2
 		}
 	}
 
 	while (pairs.size() > 1) {
-		T<T<int> /**/> new_pairs;
+		TT new_pairs;
 
-		for (typename T<T<int> /**/>::iterator i = pairs.begin(); i != pairs.end(); i++) {
-			typename T<T<int> /**/>::iterator prev = i++;
-			if (i != pairs.end())
-				new_pairs.push_back(merge(*prev, *i));
+		for (typename TT::iterator i = pairs.begin(); i != pairs.end(); i = advance(i, 2)) {
+			if (advance(i) != pairs.end())
+				new_pairs.push_back(merge(*i, *advance(i)));
 			else {
-				new_pairs.push_back(*prev);
+				new_pairs.push_back(*i);
 				break;	// need to break manually otherwise we get screwed with the +=2
 			}
 		}

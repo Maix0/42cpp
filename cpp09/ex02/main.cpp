@@ -6,14 +6,25 @@
 /*   By: maiboyer <maiboyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 16:49:00 by maiboyer          #+#    #+#             */
-/*   Updated: 2025/02/18 19:41:03 by maiboyer         ###   ########.fr       */
+/*   Updated: 2025/02/18 22:16:22 by maiboyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <algorithm>
 #include <iostream>
 #include <list>
 #include <vector>
 #include "./PMergeMe.hpp"
+
+template <typename Iterator>
+bool is_sorted(Iterator begin, Iterator end) {
+	for (Iterator i = begin; i != end; i++) {
+		Iterator next = advance(i, 1);
+		if (next != end && *i > *next)
+			return false;
+	}
+	return true;
+}
 
 int main() {
 	int values[] = {
@@ -24,26 +35,29 @@ int main() {
 	};
 
 	std::vector<int> v;
-	for (unsigned int i = 0; i < sizeof(values) / sizeof(*values); i++) {
+	for (unsigned int i = 0; i < sizeof(values) / sizeof(*values); i++)
 		v.push_back(values[i]);
-	}
-	for (unsigned int i = 0; i < v.size(); i++) {
-		std::cout << v[i] << std::endl;
-	}
+
 	v = PMergeMe<std::vector>(v);
 	std::cout << std::endl;
 	std::cout << std::endl;
 	std::cout << std::endl;
-	for (unsigned int i = 0; i < v.size(); i++) {
-		std::cout << v[i] << std::endl;
-	}
+	if (is_sorted<std::vector<int>::iterator>(v.begin(), v.end()))
+		std::cout << "it is indeed sorted !" << std::endl;
+	else
+		std::cout << "it is NOT sorted !" << std::endl;
 
 	std::list<int> l;
-	for (unsigned int i = 0; i < sizeof(values) / sizeof(*values); i++) {
+	for (unsigned int i = 0; i < sizeof(values) / sizeof(*values); i++)
 		l.push_back(values[i]);
-	}
+
 	l = PMergeMe<std::list>(l);
 	std::cout << std::endl;
 	std::cout << std::endl;
 	std::cout << std::endl;
+
+	if (is_sorted<std::list<int>::iterator>(l.begin(), l.end()))
+		std::cout << "it is indeed sorted !" << std::endl;
+	else
+		std::cout << "it is NOT sorted !" << std::endl;
 }
