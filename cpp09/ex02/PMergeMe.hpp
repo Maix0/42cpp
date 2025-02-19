@@ -6,17 +6,54 @@
 /*   By: maiboyer <maiboyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:02:57 by maiboyer          #+#    #+#             */
-/*   Updated: 2025/02/18 22:22:08 by maiboyer         ###   ########.fr       */
+/*   Updated: 2025/02/19 17:40:04 by maiboyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PMERGEME_HPP
 #define PMERGEME_HPP
 
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
+#include <iostream>
 #include <iterator>
 #include <memory>
+#include <ostream>
+
+template <typename T>
+struct Pair {
+	bool single;
+	T	 left, right;
+
+	Pair(T l, T r) {
+		single = false;
+		left   = l;
+		right  = r;
+	}
+
+	Pair(T l) {
+		single = true;
+		left   = l;
+		right  = 0;
+	}
+
+	T max() {
+		if (single)
+			return left;
+		if (left < right)
+			return right;
+		return left;
+	}
+
+	T min() {
+		if (single)
+			return left;
+		if (left > right)
+			return right;
+		return left;
+	}
+};
 
 /// copy the iterator and advance it by n elements
 template <class InputIt>
@@ -25,80 +62,106 @@ InputIt advance(InputIt it, int n = 1) {
 	return it;
 }
 
+template <class InputIt>
+std::size_t sum(InputIt begin, InputIt end) {
+	std::size_t out = 0;
+	for (InputIt it = begin; it != end; it++)
+		out += *it;
+	return out;
+}
+
 #define Titerator typename T<int>::iterator
-#define TT		  T<T<int> >
+#define Tint	  T<int>
+#define TT		  T<Pair<int> >
+#define TTrator	  typename T<Pair<int> >::iterator
 #define BTEMPLATE template <template <typename Value, typename Allocator = std::allocator<Value> > class T>
 
-BTEMPLATE
-static T<int> merge(T<int> left, T<int> right) {
-	T<int>	  sorted_list;
-	Titerator lit = left.begin();
-	Titerator rit = right.begin();
+static unsigned long long comparison = 0;
 
-	while (lit != left.end() && rit != right.end()) {
-		if (*lit < *rit)
-			sorted_list.push_back(*(lit++));
+BTEMPLATE
+void binary_insert(Tint& S, int elem) {
+	int left  = 0;
+	int right = S.size();
+
+	while (left < right) {
+		int mid		= left + (right - left) / 2;
+		comparison += 1;
+		if (*advance(S.begin(), mid) < elem)
+			left = mid + 1;
 		else
-			sorted_list.push_back(*(rit++));
+			right = mid;
 	}
-	sorted_list.insert(sorted_list.end(), lit, left.end());
-	sorted_list.insert(sorted_list.end(), rit, right.end());
-	return (sorted_list);
+	S.insert(advance(S.begin(), left), elem);
 }
 
-BTEMPLATE
-static T<int> insertion(T<int> l) {
-	assert(!l.empty());
-	for (Titerator i = advance(l.begin()); i != l.end(); i++) {
-		int		  key = *i;
-		Titerator j	  = advance(i, -1);
-		while (std::distance(j, l.begin()) >= 0 && *j > key) {
-			*advance(j) = *j;
-			j--;
-		}
-		*advance(j) = key;
-	}
-	return l;
-}
+BTEMPLATE Tint merge_insert_sort(Tint S) {
+	if (S.size() <= 1)
+		return S;
 
-BTEMPLATE
-static T<int> w(int lhs) {
-	T<int> out;
-	out.push_back(lhs);
-	return (out);
-}
-
-BTEMPLATE
-T<int> PMergeMe(T<int> l) {
-	std::size_t len = l.size();
-
-	if (len < 10)
-		return (insertion(l));
-
+	// Step 1: Pair elements arbitrarily
 	TT pairs;
-	for (Titerator i = l.begin(); i != l.end(); i = advance(i, 2)) {
-		if (advance(i) != l.end())
-			pairs.push_back(merge(w<T>(*i), w<T>(*advance(i))));
-		else {
-			pairs.push_back(w<T>(*i));
-			break;	// need to break manually otherwise we get screwed with the +=2
+	for (Titerator it = S.begin(); it != S.end(); it++, it++) {
+		Titerator next = advance(it);
+		if (next == S.end()) {
+			pairs.push_back(Pair<int>(*it));
+			break;
+		}
+		pairs.push_back(Pair<int>(*it, *next));
+	}
+
+	// Step 2: Compare each pair and keep the larger element
+	Tint largers, smallers;
+	for (TTrator it = pairs.begin(); it != pairs.end(); it++) {
+		if (!it->single) {
+			largers.push_back(it->max());
+			smallers.push_back(it->min());
+		} else
+			largers.push_back(it->left);
+	}
+
+	S = merge_insert_sort(largers);
+
+	if (!smallers.empty() and !S.empty()) {
+		Titerator	min_value = std::min_element(largers.begin(), largers.end());
+		std::size_t min_idx	  = std::distance(largers.begin(), min_value);
+
+		if (min_idx < smallers.size()) {
+			Titerator eiter	  = advance(smallers.begin(), min_idx);
+			int		  element = *eiter;
+			smallers.erase(eiter);
+
+			S.insert(S.begin(), element);
 		}
 	}
 
-	while (pairs.size() > 1) {
-		TT new_pairs;
+	Tint group_sizes;
+	group_sizes.push_back(2);
+	group_sizes.push_back(2);
 
-		for (typename TT::iterator i = pairs.begin(); i != pairs.end(); i = advance(i, 2)) {
-			if (advance(i) != pairs.end())
-				new_pairs.push_back(merge(*i, *advance(i)));
-			else {
-				new_pairs.push_back(*i);
-				break;	// need to break manually otherwise we get screwed with the +=2
-			}
-		}
-		pairs = new_pairs;
+	while (sum(group_sizes.begin(), group_sizes.end()) < smallers.size()) {
+		int n_1 = *advance(group_sizes.end(), -1);
+		int n_2 = *advance(group_sizes.end(), -2);
+		group_sizes.push_back(2 * n_2 + n_1);
 	}
-	return *pairs.begin();
+
+	std::size_t index = 0;
+	Tint		ordered_remaining;
+	for (Titerator size = group_sizes.begin(); size != group_sizes.end(); size++) {
+		if (index >= smallers.size())
+			break;
+
+		if (index + *size >= smallers.size())
+			*size = smallers.size() - index;
+		Titerator start = advance(smallers.begin(), index);
+		Titerator end	= advance(start, *size);
+		Tint	  group(start, end);
+
+		std::reverse(group.begin(), group.end());
+		ordered_remaining.insert(ordered_remaining.end(), group.begin(), group.end());
+		index += *size;
+	}
+	for (Titerator it = ordered_remaining.begin(); it != ordered_remaining.end(); it++)
+		binary_insert(S, *it);
+	return S;
 }
-
 #endif /* PMERGEME_HPP */

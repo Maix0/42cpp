@@ -6,11 +6,12 @@
 /*   By: maiboyer <maiboyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 16:49:00 by maiboyer          #+#    #+#             */
-/*   Updated: 2025/02/18 23:11:50 by maiboyer         ###   ########.fr       */
+/*   Updated: 2025/02/19 17:41:14 by maiboyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <algorithm>
+#include <cmath>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
@@ -27,6 +28,10 @@ bool is_sorted(Iterator begin, Iterator end) {
 	}
 	return true;
 }
+
+#define NB 3000
+int				   values[NB]	  = {0};
+unsigned long long comparison_max = 0;
 
 #define START_TIMER before = std::clock();
 #define END_TIMER(MSG)    \
@@ -68,7 +73,7 @@ void do_test(int values[], size_t size, std::string name) {
 	print_container(unsorted, "unsorted", name);
 
 	START_TIMER;
-	C sorted = PMergeMe(unsorted);
+	C sorted = merge_insert_sort(unsorted);
 	END_TIMER("sorting " << size << " elements using " << name);
 
 	print_container(sorted, "sorted", name);
@@ -78,17 +83,21 @@ void do_test(int values[], size_t size, std::string name) {
 	else
 		std::cout << name << " is NOT sorted !" << std::endl;
 
+	std::cout << comparison << " for a list of " << sorted.size() << " (theoritical max is " << comparison_max << ")" << std::endl;
+	comparison = 0;
 	std::cout << std::endl;
 	std::cout << std::endl;
 }
 
-#define NB 10000
-int values[NB] = {0};
-
+// main function that launches tests
 int main() {
+	int nb_values = NB;
+
 	std::srand(std::time(NULL));
-	for (int i = 0; i < NB; i++)
-		values[i] = std::rand() % (3 * NB);
+	for (int i = 0; i < nb_values; i++) {
+		values[i]		= std::rand() % (3 * nb_values);
+		comparison_max += (unsigned int)std::ceil(log2f(3. * (double)(i + 1) / 4.));
+	}
 
 	do_test<std::vector<int> /**/>(values, sizeof(values) / sizeof(values[0]), "std::vector");
 	do_test<std::list<int> /**/>(values, sizeof(values) / sizeof(values[0]), "std::list");
