@@ -6,7 +6,7 @@
 /*   By: maiboyer <maiboyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 16:49:00 by maiboyer          #+#    #+#             */
-/*   Updated: 2025/02/22 00:14:34 by maiboyer         ###   ########.fr       */
+/*   Updated: 2025/02/22 00:26:12 by maiboyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,13 +31,18 @@ bool is_sorted(Iterator begin, Iterator end) {
 
 #define NB 3000
 int				   values[NB]	  = {0};
-//{3, 3, 33, 26, 12, 30, 2, 77, 60, 50, 75, 84, 66, 72, 32, 85, 55, 39, 0, 50, 44, 6, 20, 27, 64, 33, 12, 44, 43, 70};
 unsigned long long comparison_max = 0;
 
 #define START_TIMER before = std::clock();
-#define END_TIMER(MSG)    \
-	after = std::clock(); \
-	std::cout << MSG << " took " << ((double)(after - before) * 1000000.0) / (double)(CLOCKS_PER_SEC) << "us to do !" << std::endl;
+#define END_TIMER(MSG)                                                             \
+	after = std::clock();                                                          \
+	std::cout << MSG                                                               \
+			  << " took "                                                          \
+				 "\x1b[33m"                                                        \
+			  << ((double)(after - before) * 1000000.0) / (double)(CLOCKS_PER_SEC) \
+			  << "\x1b[0m"                                                         \
+				 "us to do !"                                                      \
+			  << std::endl;
 
 template <typename It>
 const char* col(It it) {
@@ -56,14 +61,20 @@ void print_container(const C& c, const std::string& type, const std::string& nam
 		count++;
 		it++;
 	}
+	bool clipped = false;
 	for (; it != c.end(); it++) {
 		std::cout << ", " << col(it) << *it << "\x1b[0m";
-		if (++count >= max) {
+		if (++count >= max && mv(it) != c.end()) {
 			std::cout << ", ... ";
+			clipped = true;
 			break;
 		}
 	}
-	std::cout << "]" << std::endl << std::endl;
+	std::cout << "]";
+	if (clipped)
+		std::cout << " (clipped at " << max << " elements)";
+
+	std::cout << std::endl << std::endl;
 }
 
 template <typename C>
@@ -77,22 +88,36 @@ void do_test(int values[], size_t size, std::string name) {
 	START_TIMER;
 	for (unsigned int i = 0; i < size; i++)
 		unsorted.push_back(values[i]);
-	END_TIMER("pushing " << size << " elements into " << name);
+	END_TIMER(
+		"\x1b[36m"
+		"Pushing "
+		"\x1b[34m"
+		<< size
+		<< "\x1b[0m"
+		   " elements into "
+		<< name);
 
-	print_container(unsorted, "unsorted", name);
+	print_container(unsorted, name, "unsorted");
 
 	START_TIMER;
 	C sorted = merge_insert_sort(unsorted);
-	END_TIMER("sorting " << size << " elements using " << name);
+	END_TIMER(
+		"\x1b[35m"
+		"Sorting "
+		"\x1b[34m"
+		<< size
+		<< "\x1b[0m"
+		   " elements using "
+		<< name);
 
-	print_container(sorted, "sorted", name);
-
-	if (is_sorted<typename C::iterator>(sorted.begin(), sorted.end()))
-		std::cout << name << " is indeed sorted !" << std::endl;
-	else
-		std::cout << name << " is NOT sorted !" << std::endl;
+	print_container(sorted, name, "sorted");
 
 	std::cout << comparison << " for a list of " << sorted.size() << " (theoritical max is " << comparison_max << ")" << std::endl;
+	if (is_sorted<typename C::iterator>(sorted.begin(), sorted.end()))
+		std::cout << "\x1b[32m" << name << " is indeed sorted !" << "\x1b[0m" << std::endl;
+	else
+		std::cout << "\x1b[31m" << name << " is NOT sorted !" << "\x1b[0m" << std::endl;
+
 	comparison = 0;
 	std::cout << std::endl;
 	std::cout << std::endl;
