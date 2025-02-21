@@ -6,7 +6,7 @@
 /*   By: maiboyer <maiboyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 16:49:00 by maiboyer          #+#    #+#             */
-/*   Updated: 2025/02/19 17:41:14 by maiboyer         ###   ########.fr       */
+/*   Updated: 2025/02/22 00:14:34 by maiboyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 template <typename Iterator>
 bool is_sorted(Iterator begin, Iterator end) {
 	for (Iterator i = begin; i != end; i++) {
-		Iterator next = advance(i, 1);
+		Iterator next = mv(i, 1);
 		if (next != end && *i > *next)
 			return false;
 	}
@@ -31,12 +31,20 @@ bool is_sorted(Iterator begin, Iterator end) {
 
 #define NB 3000
 int				   values[NB]	  = {0};
+//{3, 3, 33, 26, 12, 30, 2, 77, 60, 50, 75, 84, 66, 72, 32, 85, 55, 39, 0, 50, 44, 6, 20, 27, 64, 33, 12, 44, 43, 70};
 unsigned long long comparison_max = 0;
 
 #define START_TIMER before = std::clock();
 #define END_TIMER(MSG)    \
 	after = std::clock(); \
 	std::cout << MSG << " took " << ((double)(after - before) * 1000000.0) / (double)(CLOCKS_PER_SEC) << "us to do !" << std::endl;
+
+template <typename It>
+const char* col(It it) {
+	if (*mv(it, -1) > *it)
+		return ("\x1b[31m");
+	return ("");
+}
 
 template <typename C>
 void print_container(const C& c, const std::string& type, const std::string& name, int max = 50) {
@@ -46,9 +54,10 @@ void print_container(const C& c, const std::string& type, const std::string& nam
 	if (it != c.end()) {
 		std::cout << *it;
 		count++;
+		it++;
 	}
 	for (; it != c.end(); it++) {
-		std::cout << ", " << *it;
+		std::cout << ", " << col(it) << *it << "\x1b[0m";
 		if (++count >= max) {
 			std::cout << ", ... ";
 			break;
