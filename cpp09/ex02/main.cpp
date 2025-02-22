@@ -6,7 +6,7 @@
 /*   By: maiboyer <maiboyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 16:49:00 by maiboyer          #+#    #+#             */
-/*   Updated: 2025/02/22 00:26:12 by maiboyer         ###   ########.fr       */
+/*   Updated: 2025/02/22 14:48:51 by maiboyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <ctime>
 #include <iostream>
 #include <list>
+#include <stdexcept>
 #include <vector>
 #include "./PMergeMe.hpp"
 
@@ -29,9 +30,9 @@ bool is_sorted(Iterator begin, Iterator end) {
 	return true;
 }
 
-#define NB 3000
-int				   values[NB]	  = {0};
-unsigned long long comparison_max = 0;
+#define MAX_NB 30000
+long		values[MAX_NB] = {0};
+std::size_t comparison_max = 0;
 
 #define START_TIMER before = std::clock();
 #define END_TIMER(MSG)                                                             \
@@ -74,11 +75,11 @@ void print_container(const C& c, const std::string& type, const std::string& nam
 	if (clipped)
 		std::cout << " (clipped at " << max << " elements)";
 
-	std::cout << std::endl << std::endl;
+	std::cout << std::endl;
 }
 
 template <typename C>
-void do_test(int values[], size_t size, std::string name) {
+void do_test(long values[], size_t size, std::string name) {
 	C			 unsorted;
 
 	// such that the variable are declared now :)
@@ -123,16 +124,39 @@ void do_test(int values[], size_t size, std::string name) {
 	std::cout << std::endl;
 }
 
-// main function that launches tests
-int main() {
-	int nb_values = NB;
-
-	std::srand(std::time(NULL));
-	for (int i = 0; i < nb_values; i++) {
-		values[i]		= std::rand() % (3 * nb_values);
-		comparison_max += (unsigned int)std::ceil(log2f(3. * (double)(i + 1) / 4.));
+void parse_argv(std::size_t& nb, int argc, char* argv[]) {
+	std::size_t index = 0;
+	if (argc >= MAX_NB) {
+		argc = MAX_NB;
+		std::cerr << "Clamping args to " << argc << "..." << std::endl;
 	}
+	nb = argc;
+	while (index < nb) {
+		char*	  end	= NULL;
+		long long value = std::strtol(*argv, &end, 10);
+		if (end != NULL & *end != '\0')
+			throw std::runtime_error((std::string("unable to parse ") + *argv).c_str());
+		values[index++] = value;
+	}
+};
 
-	do_test<std::vector<int> /**/>(values, sizeof(values) / sizeof(values[0]), "std::vector");
-	do_test<std::list<int> /**/>(values, sizeof(values) / sizeof(values[0]), "std::list");
+// main function that launches tests
+int main(int argc, char* argv[]) {
+	try {
+		(void)(argv++, argc--);	 // skip argv[0];
+		std::size_t nb_values = 10000;
+		if (argc != 0)
+			parse_argv(nb_values, argc, argv);
+		else {
+			std::srand(std::time(NULL));
+			for (std::size_t i = 0; i < nb_values; i++) {
+				values[i]		= std::rand() % (3 * nb_values);
+				comparison_max += (std::size_t)std::ceil(log2f(3. * (double)(i + 1) / 4.));
+			}
+		}
+
+		do_test<std::vector<int> /**/>(values, nb_values, "std::vector");
+		do_test<std::list<int> /**/>(values, nb_values, "std::list");
+	} catch (const std::exception& e) {
+	}
 }

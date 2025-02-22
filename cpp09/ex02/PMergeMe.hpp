@@ -6,7 +6,7 @@
 /*   By: maiboyer <maiboyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:02:57 by maiboyer          #+#    #+#             */
-/*   Updated: 2025/02/22 00:20:00 by maiboyer         ###   ########.fr       */
+/*   Updated: 2025/02/22 14:34:00 by maiboyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,6 @@
 #define PMERGEME_HPP
 
 #include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <iterator>
 #include <memory>
 
 #define TX		 T<X>
@@ -68,12 +65,13 @@ std::size_t sum(It begin, It end) {
 }
 
 TEMPLATE
-void binary_insert(TX& S, X elem, std::size_t end) {
+void binary_insert(TX& S, X elem, ssize_t end) {
 	std::size_t left  = 0;
 	std::size_t right = end;
 
 	while (left < right) {
 		std::size_t mid = left + (right - left) / 2;
+
 		comparison++;
 		if (*mv(S.begin(), mid) < elem)
 			left = mid + 1;
@@ -89,9 +87,8 @@ TX merge_insert_sort(TX S) {
 		return S;
 
 	// Step 1: Pair elements arbitrarily
-	TP			pairs;
-	std::size_t index = 1;
-	for (Xrator it = S.begin(); it != S.end(); it++, it++, index++) {
+	TP pairs;
+	for (Xrator it = S.begin(); it != S.end(); it = mv(it, 2)) {
 		Xrator next = mv(it);
 		if (next == S.end()) {
 			pairs.push_back(Pair<X>(*it));
@@ -119,38 +116,26 @@ TX merge_insert_sort(TX S) {
 		}
 	}
 
-	std::size_t	   smallers_size = smallers.size();
-	T<std::size_t> group_size;
-	group_size.push_back(2);
-	group_size.push_back(2);
-	std::size_t groups = 2;
-	while (sum(group_size.begin(), group_size.end()) < smallers_size) {
-		std::size_t m1_pow_n = (groups % 2) ? -1 : 1;
-		group_size.push_back((((2 << groups) - m1_pow_n) / 3) + 1);
-		groups++;
-	}
+	TX			all_groups;
+	std::size_t smallers_size = smallers.size();
+	std::size_t g_idx		  = 0;
+	std::size_t index		  = 0;
+	while (index < smallers_size) {
+		std::size_t m1_pow_n = (g_idx % 2) ? -1 : 1;
+		std::size_t size	 = (((2 << g_idx) - m1_pow_n) / 3) + 1;
+		if (size < 2)
+			size = 2;
+		std::size_t end_idx = std::min(index + size, smallers_size);
 
-	TX all_groups;
+		Xrator		start	= mv(smallers.begin(), index);
+		Xrator		end		= mv(smallers.begin(), end_idx);
 
-	index = 0;
-	for (typename T<std::size_t>::iterator size = group_size.begin(); size != group_size.end(); size++) {
-		if (index >= smallers_size)
-			break;
-		std::size_t end_idx	 = std::min(index + *size, smallers_size);
-
-		Xrator		start	 = mv(smallers.begin(), index);
-		Xrator		end		 = mv(smallers.begin(), end_idx);
-		index				+= *size;
-
-		TX group(start, end);
-		std::reverse(group.begin(), group.end());
-
-		all_groups.insert(all_groups.end(), group.begin(), group.end());
+		all_groups.insert(all_groups.end(), std::reverse_iterator<Xrator>(end), std::reverse_iterator<Xrator>(start));
+		index += size;
 	}
 
 	for (Xrator it = all_groups.begin(); it != all_groups.end(); it++) {
 		Xrator bound = std::find(S.begin(), S.end(), *it);
-
 		binary_insert(S, *it, std::distance(S.begin(), bound));
 	}
 
