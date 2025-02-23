@@ -6,9 +6,13 @@
 /*   By: maiboyer <maiboyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:02:57 by maiboyer          #+#    #+#             */
-/*   Updated: 2025/02/22 14:34:00 by maiboyer         ###   ########.fr       */
+/*   Updated: 2025/02/23 13:45:45 by maiboyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+//! Some templates have `/**/` in them. this is due to a limitation that requires the `>` to not be right next to eachothers (aka they need
+//! whitespace). Due to the formatter that doesn't understant that and remove said whitespace, these comments are inserted to force them not
+//! touching...
 
 #ifndef PMERGEME_HPP
 #define PMERGEME_HPP
